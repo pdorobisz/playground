@@ -11,3 +11,5 @@ libraryDependencies += "com.sksamuel.elastic4s" %% "elastic4s-core" % "5.3.2"
 libraryDependencies += "com.sksamuel.elastic4s" %% "elastic4s-tcp" % "5.3.2"
 
 libraryDependencies += "com.sksamuel.elastic4s" %% "elastic4s-jackson" % "5.3.2"
+
+libraryDependencies += "io.codearte.jfairy" % "jfairy" % "0.5.7"
