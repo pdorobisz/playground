@@ -1,5 +1,7 @@
 package playground.elasticsearch.data
 
+import java.util.UUID
+
 import io.codearte.jfairy.Fairy
 
 import scala.util.Random
@@ -8,7 +10,7 @@ object DataGenerator {
 
   private val fairy = Fairy.create()
 
-  def randomCompanies: List[Company] = (0 to 100).map(_ => randomCompany).toList
+  def randomCompanies(size: Int = 100): List[Company] = (0 until size).map(_ => randomCompany).toList
 
   private def randomCompany: Company = {
     val randomPerson = fairy.person()
@@ -19,6 +21,19 @@ object DataGenerator {
       Person(if (randomPerson.isMale) "Mr" else "Mrs", randomPerson.getFullName, randomPerson.getAge),
       randomTags.toList)
   }
+
+  def randomUsers(size: Int = 100): List[User] = {
+    def randomUserCompany: UserCompany = UserCompany(UUID.randomUUID().toString, fairy.company().getName)
+
+    def randomUser(userCompany: UserCompany): User = {
+      val randomPerson = fairy.person()
+      User(randomPerson.getFirstName, randomPerson.getLastName, randomPerson.getAge, userCompany)
+    }
+
+    val userCompanies = (0 until (size / 4)).map(_ => randomUserCompany)
+    (0 until size).map(i => randomUser(userCompanies(i / 4))).toList
+  }
+
 
   private def randomTags = (0 to Random.nextInt(4)).map(_ => Tags(Random.nextInt(Tags.length))).toSet
 
