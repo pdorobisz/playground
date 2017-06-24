@@ -2,12 +2,14 @@ package playground.elasticsearch
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.jackson.ElasticJackson.Implicits._
+import com.sksamuel.elastic4s.script.ScriptDefinition
 import playground.elasticsearch.data.{Company, User}
 
 object ExampleQueries extends App with ElasticSearchConfig {
 
   //  example1()
   example2()
+  //  example3()
 
   private def example1() = {
     val result = esClient.execute(
@@ -20,11 +22,19 @@ object ExampleQueries extends App with ElasticSearchConfig {
 
   private def example2() = {
     val result = esClient.execute(
-      search(UsersIndex / PersonType).query(termQuery("company.id", "2536be75-bdb1-4a07-992e-eff8d37ee726"))
+      search(UsersIndex / PersonType).query(termQuery("company.id", "4d3c98ed-e994-4ed3-9cae-d243dc087bf6"))
     ).await
 
     val text = result.to[User].mkString("\n")
     println(text)
+  }
+
+  private def example3() = {
+    esClient.execute(
+      updateIn(UsersIndex)
+        .query(termQuery("company.id", "4d3c98ed-e994-4ed3-9cae-d243dc087bf6"))
+        .script(ScriptDefinition("ctx._source.company.name=\"UPDATED\""))
+    ).await
   }
 
 }

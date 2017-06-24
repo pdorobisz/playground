@@ -49,9 +49,12 @@ object Setup extends App with ElasticSearchConfig {
     println(s"creating $UsersIndex index...")
     esClient.execute {
       createIndex(UsersIndex).mappings(
-        mapping(PersonType) as (
-          keywordField("id")
+        mapping(PersonType) as(
+          keywordField("id"),
+          objectField("company").fields(
+            keywordField("id")
           )
+        )
       )
     }.await
     println(s"index $UsersIndex created")
