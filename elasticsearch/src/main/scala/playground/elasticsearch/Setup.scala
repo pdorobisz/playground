@@ -1,7 +1,8 @@
 package playground.elasticsearch
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import playground.elasticsearch.data.DataGenerator
+import com.sksamuel.elastic4s.analyzers.{CustomAnalyzerDefinition, PathHierarchyTokenizer}
+import playground.elasticsearch.data.{Category, DataGenerator}
 import com.sksamuel.elastic4s.jackson.ElasticJackson.Implicits._
 
 import scala.concurrent.Future
@@ -15,6 +16,9 @@ object Setup extends App with ElasticSearchConfig {
 
   initUsers()
   insertUsersData()
+
+  initCategories()
+  insertCategoriesData()
 
   private def initOrganisations() = {
     removeOldIndex(OrganisationsIndex)
@@ -60,6 +64,21 @@ object Setup extends App with ElasticSearchConfig {
     println(s"index $UsersIndex created")
   }
 
+  private def initCategories() = {
+    removeOldIndex(CategoriesIndex)
+
+    println(s"creating $CategoriesIndex index...")
+    esClient.execute {
+      createIndex(CategoriesIndex).mappings(
+        mapping(CategoryType) as(
+          textField("path").analyzer("path-analyzer"),
+          textField("name")
+        )
+      ).analysis(CustomAnalyzerDefinition(name = "path-analyzer", tokenizer = PathHierarchyTokenizer("path-tokenizer")))
+    }.await
+    println(s"index $CategoriesIndex created")
+  }
+
   private def removeOldIndex(index: String) = {
     esClient.execute(indexExists(index)).flatMap(exists =>
       if (exists.isExists) {
@@ -84,6 +103,17 @@ object Setup extends App with ElasticSearchConfig {
 
     esClient.execute {
       bulk(data: _*)
+    }.await
+  }
+
+  private def insertCategoriesData() = {
+    val categories = Seq(Category("/for-sale/furtniture", "Furniture"), Category("/for-sale/furtniture/table", "Table"),
+      Category("/for-sale/furtniture/chair", "Chair"), Category("/for-sale/cars", "Cars for sale"),
+      Category("/for-sale/cars/trucks", "Trucks for sale"), Category("/for-sale/cars/vans", "Vans for sale"),
+      Category("/for-sale/cars/suv", "SUVs for sale"))
+    val ops = categories.map(indexInto(CategoriesIndex, CategoryType).doc(_))
+    esClient.execute {
+      bulk(ops: _*)
     }.await
   }
 }
