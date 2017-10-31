@@ -32,7 +32,7 @@ object ExampleQueries extends App with ElasticSearchConfig {
 
   private def example3() = {
     esClient.execute(
-      updateIn(UsersIndex)
+      updateIn(UsersIndex / PersonType)
         .query(termQuery("company.id", "4d3c98ed-e994-4ed3-9cae-d243dc087bf6"))
         .script(ScriptDefinition("ctx._source.company.name=\"UPDATED\""))
     ).await
