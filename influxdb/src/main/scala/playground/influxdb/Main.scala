@@ -13,10 +13,11 @@ object Main extends App {
   val influxDb = InfluxDB.connect("localhost", 8086)
   val database = influxDb.selectDatabase("testdb")
 
-  val point = Point("testpoint")
-    .addTag("tag1", "test1")
-    .addField("field1", 10)
-    .addField("field2", 20)
+  val point = Point("cpu")
+    .addTag("host", "serverB")
+    .addTag("region", "us_west")
+    .addField("core1", 0.51)
+    .addField("core2", 0.13)
   val f = database.write(point, precision = Precision.MILLISECONDS)
   f.onComplete(_ => influxDb.close())
 
