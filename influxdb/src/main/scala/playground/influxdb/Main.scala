@@ -1,5 +1,7 @@
 package playground.influxdb
 
+import java.text.SimpleDateFormat
+
 import com.paulgoldbaum.influxdbclient.Parameter.Precision
 import com.paulgoldbaum.influxdbclient.{InfluxDB, Point}
 
@@ -10,10 +12,14 @@ object Main extends App {
 
   import scala.concurrent.ExecutionContext.Implicits._
 
+  val dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  val timestamp = dateFormat.parse("2017-12-01T10:00:03.000Z").getTime
+
   val influxDb = InfluxDB.connect("localhost", 8086)
   val database = influxDb.selectDatabase("testdb")
 
-  val point = Point("cpu")
+  // timestamp is optional, if not provided current time will be used
+  val point = Point("cpu", timestamp)
     .addTag("host", "serverB")
     .addTag("region", "us_west")
     .addField("core1", 0.51)
