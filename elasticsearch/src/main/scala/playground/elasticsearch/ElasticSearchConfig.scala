@@ -1,6 +1,7 @@
 package playground.elasticsearch
 
 import com.sksamuel.elastic4s.{ElasticsearchClientUri, TcpClient}
+import org.elasticsearch.common.settings.Settings
 
 trait ElasticSearchConfig {
   val CategoriesIndex = "categories"
@@ -11,5 +12,7 @@ trait ElasticSearchConfig {
   val PersonType = "person"
   val CategoryType = "category"
 
-  val esClient = TcpClient.transport(ElasticsearchClientUri("localhost", 9300))
+  val esClient = TcpClient.transport(Settings.builder()
+    .put("cluster.name", "searchservice").build(),
+    ElasticsearchClientUri("localhost", 9300))
 }
