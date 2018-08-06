@@ -1,0 +1,36 @@
+package example1
+
+import playground.drools.Example1.Person
+
+
+// Ta i nastepna regula moga zostac wykonane. Kolejnosc wykonania taka jak w pliku.
+rule "Is 17 years old"
+dialect "mvel"
+when
+    $p : Person( age == 17)
+then
+    System.out.println( "Is 17 years old: " + $p.name);
+    $p.age = $p.age + 1;
+    update($p); // poinformowanie Drools, ze fakt (obiekt) ulegl zmianie
+end
+
+// Gdyby poprzednia regula nie miala update to ta regula zostalaby wykonana, gdyz Drools dalej "widzialyby" stare wartosci.
+rule "Is less than 18 years old"
+dialect "mvel"
+when
+    $p : Person( age < 18)
+then
+    System.out.println( "Is less than 18 years old: " + $p.name);
+    $p.age = $p.age + 1;
+end
+
+// Ta regula moze zostac wykonana dopiero gdy poprzednia regula uaktualni odpowiednio obiekt.
+rule "Is 18 years old and has low salary"
+dialect "mvel"
+when
+    $p : Person( age == 18, salary < 150)
+then
+    System.out.println( "Is 18 years old: " + $p.name + ", salary: " + $p.salary);
+    $p.salary = $p.salary + 20;
+    update($p);
+end

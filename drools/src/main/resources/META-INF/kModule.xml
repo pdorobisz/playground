@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+
+    <kbase name="my-rules" packages="rules">
+        <ksession name="my-stateless-ksession" type="stateless"/>
+        <ksession name="my-stateful-ksession"/>
+    </kbase>
+
+    <kbase name="example1" packages="example1">
+        <ksession name="example1-session" type="stateless"/>
+    </kbase>
+</kmodule>
